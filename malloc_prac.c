@@ -13,15 +13,15 @@ int main()
 	    printf("AAA Too Much Memory!!");
 	}else{
 	    for(int i = 0; i < memory; i++){
-            arr[i] = alph[alphLoop];
-            printf("%c",arr[alphLoop]);
-            alphLoop++;
-            if(alphLoop > 25){
-                alphLoop = 0;
-            }
-            if(i >= 400){
-                break;
-            }
+            	arr[i] = alph[alphLoop];
+            	printf("%c",arr[alphLoop]);
+            	alphLoop++;
+            	if(alphLoop > 25){
+                	alphLoop = 0;
+            	}
+            	if(i >= 400){
+               	 break;
+            	}
         }
 	}
 	
