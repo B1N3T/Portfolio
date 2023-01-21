@@ -1,5 +1,12 @@
 #include <stdio.h>
 
+//Refresh should clear then draw
+//Case to Choose which Opcode is running
+char keypad{
+  
+  return(key);  
+};
+
 const uint8_t FontSet[80] = {
     //Font
     0xF0, 0x90, 0x90, 0x90, 0xF0, // 0
@@ -30,8 +37,10 @@ uint16_t opcodes[6] = {
 };
 
 bool Display[64][32];
+//Point Counter and Index Register
 uint16_t I;
 uint16_t PC;
+//Registers V0-VF
 uint8_t V0;
 uint8_t V1;
 uint8_t V2;
