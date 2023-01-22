@@ -49,14 +49,6 @@ uint16_t inst;
 uint8_t CPU()
 {
     uint8_t Memory[4096];
-    
-    //Display Set to blank
-    for(int i = 0; i < 64; i++){
-        for(int j = 0; j < 32; j++){
-            Display[i][j] = 0;
-        }
-    }
-    
     uint8_t delayTimer;
     uint8_t soundTimer;
     
@@ -71,10 +63,49 @@ int main(){
     
     while(1){
         //Fetch
-        inst = memory[PC] + memory[PC+1];
+        opcode = memory[PC] << 8 | memory[PC+1];
+        nnn = opcode & 0x0FFF;
+        nn = opcode & 0x00FF;
+        n = opcode & 0x000F;
+        x = opcode & 0x0F00;
+        y = opcode & 0x00F0;
         PC += 2;
-        //Decode
         
+        //Processing
+        switch(opcode & 0xF000){
+            case(0x0000):
+                switch(nn){
+                    case(0x00E0):
+                    //Display Set to blank
+                    for(int i = 0; i < 64; i++){
+                        for(int j = 0; j < 32; j++){
+                            Display[i][j] = 0;
+                        }
+                    }
+                    break;
+                }    
+            case(0x1000):
+                PC = nnn;
+                break;
+                
+            case(0x6000):
+                V[x] = nn;
+                break;
+
+            case(0x7000):
+                V[x] += nn; 
+                break;
+
+            case(0xA000):
+                I = nnn;
+                break;
+                
+            case(0xD000):
+                V[Y];
+                V[x];
+                Display[i][n];
+                break;
+        };
     }
     return 0;
 }
