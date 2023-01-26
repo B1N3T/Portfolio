@@ -1,111 +1,100 @@
 #include <stdio.h>
-
-//Refresh should clear then draw
-//Case to Choose which Opcode is running
-char keypad{
-  
-  return(key);  
-};
-
-const char FontSet[80] = {
-    //Font
-    0xF0, 0x90, 0x90, 0x90, 0xF0, // 0
-    0x20, 0x60, 0x20, 0x20, 0x70, // 1
-    0xF0, 0x10, 0xF0, 0x80, 0xF0, // 2
-    0xF0, 0x10, 0xF0, 0x10, 0xF0, // 3
-    0x90, 0x90, 0xF0, 0x10, 0x10, // 4
-    0xF0, 0x80, 0xF0, 0x10, 0xF0, // 5
-    0xF0, 0x80, 0xF0, 0x90, 0xF0, // 6
-    0xF0, 0x10, 0x20, 0x40, 0x40, // 7
-    0xF0, 0x90, 0xF0, 0x90, 0xF0, // 8
-    0xF0, 0x90, 0xF0, 0x10, 0xF0, // 9
-    0xF0, 0x90, 0xF0, 0x90, 0x90, // A
-    0xE0, 0x90, 0xE0, 0x90, 0xE0, // B
-    0xF0, 0x80, 0x80, 0x80, 0xF0, // C
-    0xE0, 0x90, 0x90, 0x90, 0xE0, // D
-    0xF0, 0x80, 0xF0, 0x80, 0xF0, // E
-    0xF0, 0x80, 0xF0, 0x80, 0x80  // F
-};
-
-/*uint16_t opcodes[6] = {
-    00E0, //Clear screen
-    1NNN, //Jump
-    6XNN, //Set Register VX
-    7XNN, //Add value to register VX
-    ANNN, //Set index register
-    DXYN  //Display/draw
-};*/
+#include <stdlib.h>
+#include <string.h>
+#include <stdint.h>
 
 uint16_t opcode;
-bool Display[64][32];
-//Point Counter and Index Register
 uint16_t I;
+uint8_t loadMem[3584]; 
+uint8_t Memory[4096];
+uint8_t v[16];
+int display[64][32];
 int PC;
-//Registers V0-VF
-uint8_t V[16];
-//Instruction
-uint16_t inst;
 
-uint8_t CPU()
+uint8_t* loadMemory()
 {
-    uint8_t Memory[4096];
-    uint8_t delayTimer;
-    uint8_t soundTimer;
-    
-    return 0;
-};
+    FILE* ptr;
+    int ch;
+    int i = 0;
+
+    // Opening file in reading mode
+    ptr = fopen("IBMLogo.ch8", "r");
+ 
+    if (NULL == ptr) {
+        printf("file can't be opened \n");
+    }
+ 
+    printf("content of this file are \n");
+ 
+    // Printing what is written in file
+    // character by character using loop.
+    do {
+        ch = fgetc(ptr);
+        //printf("%x ", ch);
+        loadMem[i] = ch;
+        i++;
+        // Checking if character is not EOF.
+        // If it is EOF stop reading.
+    } while (ch != EOF);
+
+    // Closing the file
+    fclose(ptr);
+    return (loadMem);
+}
 
 int main(){
-    //Font Allocated in Memory
-    for(int i = 0; i < sizeof(FontSet[80]); i++){
-        Memory[50+i] = FontSet[i];
-    }
-    
+    PC = 0x0200;
+    uint8_t* Mem = loadMemory();
+
+    for(int i = 0; i < sizeof(loadMem);i++){
+        Memory[0x0200 + i] = Mem[i];
+    }   
+
+    opcode = Memory[PC] << 8 | Memory[PC+1];
+    uint16_t nnn = opcode & 0x0FFF;
+    uint8_t nn = opcode & 0x00FF;
+    uint8_t n = opcode & 0x000F;
+    int x = opcode & 0x0F00;
+    int y = opcode & 0x00F0;
     while(1){
-        //Fetch
-        opcode = memory[PC] << 8 | memory[PC+1];
-        nnn = opcode & 0x0FFF;
-        nn = opcode & 0x00FF;
-        n = opcode & 0x000F;
-        x = opcode & 0x0F00;
-        y = opcode & 0x00F0;
-        PC += 2;
-        
-        //Processing
         switch(opcode & 0xF000){
-            case(0x0000):
-                switch(nn){
-                    case(0x00E0):
-                    //Display Set to blank
-                    for(int i = 0; i < 64; i++){
-                        for(int j = 0; j < 32; j++){
-                            Display[i][j] = 0;
-                        }
-                    }
+            case 0x0000:
+                switch (opcode & 0x00FF)
+                {
+                case 0x00E0:
+                    for(int i = 0; i < 32; i++){
+                        for(int j = 0; j < 64; j++){
+                            display[i][j] = 0;
+                        };
+                    };
                     break;
-                }    
-            case(0x1000):
+                
+                default:
+                    break;
+                }
+            break;
+
+            case 0x1000:
                 PC = nnn;
                 break;
-                
-            case(0x6000):
-                V[x] = nn;
+
+            case 0x6000:
+                v[x] = nn;
                 break;
 
-            case(0x7000):
-                V[x] += nn; 
+            case 0x7000:
+                v[x] = nn;
                 break;
 
-            case(0xA000):
+            case 0xA000:
                 I = nnn;
                 break;
-                
-            case(0xD000):
-                V[Y];
-                V[x];
-                Display[i][n];
+
+            case 0xD000:
                 break;
-        };
+
+            default:
+                exit(42);
+        }
     }
-    return 0;
 }
